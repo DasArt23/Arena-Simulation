@@ -6,6 +6,10 @@ using size_t = std::size_t;
 enum KeyActions {INPUT, OUTPUT, DELAY};
 enum CommandType {MOUSE, KEY_ACTION, RESIZE_WIND};
 
+namespace sf {
+    class RenderWindow;
+}
+
 struct Command{
 	CommandType type;
 	virtual ~Command(void) = default;
@@ -45,14 +49,21 @@ class Window{
 	private:
 		unsigned int width, height;
 		std::string title;
-		bool is_closed = true;
 		Commands current_commands{};
+		sf::RenderWindow* wind;
 	public:
-		Window(std::string wind_title = "Application", unsigned int w_width = 100, unsigned int w_height = 100){}
+		Window(std::string wind_title = "Application", unsigned int w_width = 100, unsigned int w_height = 100);
+		~Window();
+
+		Window(const Window&) = delete;
+		Window& operator=(const Window&) = delete;
+
 		//void change_window(struct Elements& elements_to_show);
 		void create();
 		void close();
-
+		bool isOpen() const;
+		
+		sf::RenderWindow* get_native_window() const;
 		const Commands& get_commands(void) const;
 		void clear_commands(void);
 };

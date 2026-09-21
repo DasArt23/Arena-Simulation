@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+find_package(SFML 2.5 REQUIRED COMPONENTS system window graphics)
 
 if(CMAKE_EXPORT_COMPILE_COMMANDS)
     add_custom_target(copy_compile_commands
@@ -30,4 +31,5 @@ add_custom_target(run
     COMMENT "Запуск Arena Simulation..."
 )
 
+target_link_libraries(ArenaSimulation PRIVATE sfml-graphics sfml-window sfml-system)
 target_include_directories(ArenaSimulation PRIVATE src)
