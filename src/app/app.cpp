@@ -13,8 +13,13 @@ Application::Application(std::string name):app_name(name),app_window(app_name){
 }
 
 void Application::run(){
-	Shape* rect = new RectShape(Vec2(1000.0f, 200.0f), Vec2(100.0f, 100.0f), sf::Color::Magenta);
-	std::vector<Shape*> shapes = {rect};
+	std::vector<Shape*> shapes{};
+	shapes.push_back(new RectShape({100, 50}, {200, 200}, sf::Color::Red));
+	shapes.push_back(new CircleShape(50, {400, 300}, sf::Color::Green));
+	for (auto* s : shapes) s->set_origin_center();
+	shapes[0]->set_rotation(45.0f);
+	shapes[1]->set_scale({2, 1});
+	shapes[1]->set_rotation(90.0f);
 	while(app_window.isOpen()){
 		update();
 		if(!app_window.isOpen()) break;

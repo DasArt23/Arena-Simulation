@@ -1,4 +1,5 @@
 #pragma once
+#include <numbers>
 #include <math/vec2.hpp>
 #include <math/transform.hpp>
 #include <SFML/Graphics/Color.hpp>
@@ -10,10 +11,12 @@ namespace sf {
 class Shape{
 protected:
 	Transform transform;
+	virtual Vec2 local_center() const = 0;
 public:
 	virtual ~Shape() = default;
 	virtual void draw(sf::RenderTarget& target) const = 0;
-
+	
+	void set_origin_center()		{ transform.origin = local_center(); } 
 	void set_position(const Vec2& p){ transform.position = p; }
 	void set_scale(const Vec2& s)	{ transform.scale = s; }
 	void set_rotation(float r)		{ transform.rotation = r; }
@@ -26,17 +29,24 @@ public:
 	const Transform& get_transform() const { return transform; }
 };
 
-class RectShape : public Shape{
-private:
-	Vec2 size;
-	sf::Color color = sf::Color::White;
+class ColoredShape : public Shape{
+protected:
+	sf::Color color;
 public:
-	RectShape(const Vec2& size, const Vec2& pos, sf::Color clr = sf::Color::White);
-	RectShape(const Vec2& size, sf::Color clr);
-	RectShape(const Vec2& size);
+	explicit ColoredShape(sf::Color color = sf::Color::White):color(color){}
+	void set_color(sf::Color clr) 	{ color = clr; }
+	sf::Color get_color() const { return color; }
+};
+
+class RectShape : public ColoredShape{
+	Vec2 size;
+protected:
+	Vec2 local_center() const override { return Vec2{size.x / 2, size.y / 2}; }
+public:
+	RectShape(const Vec2& size, const Vec2& pos, sf::Color color = sf::Color::White);
+	RectShape(const Vec2& size, sf::Color color = sf::Color::White);
 	void draw(sf::RenderTarget& target) const override;
 
-	void set_color(sf::Color clr) 	{ color = clr; }
 	void set_width(float w) 	{ size.x = w; }
 	void set_height(float h)	{ size.y = h; }
 	
@@ -44,7 +54,19 @@ public:
 	float get_width() const 	{ return size.x; }
 	float get_height() const	{ return size.y; }
 	float get_area() const		{ return size.x * size.y; }
-	sf::Color get_color() const { return color; }
 };
 
+class CircleShape : public ColoredShape{
+	float radius;
+protected:
+	Vec2 local_center() const override { return Vec2{radius, radius}; }
+public:
+	CircleShape(float radius, const Vec2& pos, sf::Color clr = sf::Color::White);
+	CircleShape(float radius, sf::Color clr = sf::Color::White);
+	void draw(sf::RenderTarget& target) const override;
 
+	void set_radius(float rads)		{ radius = rads; }
+	
+	float get_radius() const 	{ return radius;}
+	float get_area() const		{ return radius*radius*std::numbers::pi_v<float>; }
+};
