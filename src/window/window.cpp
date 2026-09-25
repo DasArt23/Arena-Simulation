@@ -1,43 +1,88 @@
 #include "window.hpp"
-#include <SFML/Graphics.hpp>
-#include <SFML/Window/VideoMode.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Window/Event.hpp>
+#include <cassert>
 
-Window::Window(std::string wind_title, unsigned int w_width, unsigned int w_height):
+Window::Window(std::string wind_title, uint w_width, uint w_height):
 	title(wind_title),width(w_width),
 	height(w_height),wind(nullptr){}
 
 Window::~Window(void){
-	clear_commands();
 	close();
 }
 
-void Window::clear_commands(void){
+void Window::clear_commands(){
 	current_commands.clear();
 }
 
-void Window::create(void){
+void Window::set_default_size() {
+    sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+    width  = static_cast<uint>(desktop.width * 0.75f);
+    height = static_cast<uint>(desktop.height * 0.6f);
+}
+
+void Window::create(){
 	if(wind) close();
 	wind = new sf::RenderWindow(sf::VideoMode(width, height), title);
 }
 
-void Window::close(void){
+void Window::close(){
 	current_commands.clear();
 	if(wind){
-		if(wind && wind->isOpen()) wind->close();
+		if(wind->isOpen()) wind->close();
 		delete wind;
 		wind = nullptr;
 	}
 }
 
-const Commands& Window::get_commands(void) const{
-	const Commands& commands = current_commands;
-	return commands;
+const Commands& Window::get_commands() const{
+	return current_commands;
 }
 
-bool Window::isOpen(void) const{
+bool Window::isOpen() const{
 	return wind && wind->isOpen();
 }
 
-sf::RenderWindow* Window::get_native_window() const {
-    return wind;
+sf::RenderTarget& Window::get_target() const {
+	assert(wind);
+    return *wind;
+}
+
+void Window::display(){
+	if(wind) wind->display();
+}
+
+void Window::poll_events(){
+	if(!wind) return;
+	current_commands.clear();
+
+	sf::Event event;
+	while(wind->pollEvent(event)){
+		switch(event.type){
+			case sf::Event::Closed:
+				current_commands.push_back(WindowClosed{});
+				return;
+			case sf::Event::MouseMoved:
+				current_commands.push_back(MouseMove{
+					event.mouseMove.x,
+					event.mouseMove.y
+				});
+				break;
+			case sf::Event::KeyPressed:
+				current_commands.push_back(KeyPressed{
+					static_cast<KeyCode>(event.key.code)
+				});
+				break;
+			case sf::Event::Resized:
+				width = event.size.width;
+				height = event.size.height;
+				current_commands.push_back(WindowResize{
+					static_cast<int>(width), 
+					static_cast<int>(height)
+				});
+				break;
+			default:
+				break;
+		}
+	}
 }

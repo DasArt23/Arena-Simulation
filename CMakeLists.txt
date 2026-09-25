@@ -23,12 +23,14 @@ add_executable(ArenaSimulation
     main.cpp
     src/app/app.cpp
     src/window/window.cpp
+	src/window/render.cpp
+	src/window/shape.cpp
 )
 
 add_custom_target(run
     COMMAND $<TARGET_FILE:ArenaSimulation>
     DEPENDS ArenaSimulation
-    COMMENT "Запуск Arena Simulation..."
+	COMMENT "Running Arena Simulation..."
 )
 
 target_link_libraries(ArenaSimulation PRIVATE sfml-graphics sfml-window sfml-system)

@@ -1,19 +1,28 @@
 #pragma once
-#include <vector>
+#include "shape.hpp"
+#include <SFML/Graphics/RenderTarget.hpp>
 
 namespace sf {
-    class RenderWindow;
+    class RenderTarget;
 }
-struct Shape{
-	int id;
-	virtual ~Shape() = default;
-	Shape(int m_id):id(m_id){}
+
+template <typename Container>
+concept ShapePointerContainer = requires(Container c){
+	{*c.begin()} -> std::convertible_to<const Shape*>;
 };
 
 class Render{
 private:
-	sf::RenderWindow* m_window;
+	sf::RenderTarget& m_target;
+	sf::Color m_color;
 public:
-	Render(sf::RenderWindow* wind);
-	void render(const std::vector<Shape*> shapes);
+	explicit Render(sf::RenderTarget& target, sf::Color color = sf::Color::Black);
+	
+	void set_default_color(sf::Color color);
+
+	template <ShapePointerContainer Container>
+	void render(const Container& shapes) const {
+	    m_target.clear(sf::Color::Black);
+	    for (const auto& shape : shapes) if(shape) shape->draw(m_target);
+	}
 };
