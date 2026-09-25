@@ -16,6 +16,6 @@ private:
 public:
 	Application(std::string app_name = "App");
 	void run();
-	void update();
+	void update(float dt);
 };
 

@@ -25,6 +25,7 @@ add_executable(ArenaSimulation
     src/window/window.cpp
 	src/window/render.cpp
 	src/window/shape.cpp
+	src/math/clock.cpp
 )
 
 add_custom_target(run
