@@ -1,35 +1,55 @@
 # Arena-Simulation
-This is an arena simulation where AI bots, 
-created using a genetic algorithm, will fight, learn, and evolve to win. 
-The project is built with **C++20**.
 
-The simulation is built entirely from scratch. I am developing this project out of personal interest 
-and a desire to practice C++ while gaining hands-on knowledge of how genetic algorithms and game engines work.
+This is an arena simulation where AI bots,
+created using a genetic algorithm, will fight, learn, and evolve to win.
 
-## Building and running
+The project is built with **C++20** and **SFML 3**.
+
+The simulation is built entirely from scratch. I am developing this project out of personal interest
+and a desire to practice C++ while gaining hands-on knowledge of how genetic algorithms,
+game engines, build systems, and low-level C++ development work.
+
+## Current status
+
+The project is currently being migrated from **SFML 2 to SFML 3.1**.
+
+The build system has also been reworked to use a CMake superbuild:
+- SFML is downloaded and built separately from the application;
+- the application uses the installed SFML package through `find_package`;
+- CMake Presets provide a common build interface;
+- Ninja is used as the build system.
+
+The SFML 3 API migration is still in progress.
+
+## Building
 
 ### Prerequisites
-* **CMake** (version 3.15 or higher) — [Official Installation Guide](https://cmake.org)
-* For Ubuntu/Debian users, you can install it via terminal:
-  ```bash
-  sudo apt update && sudo apt install cmake build-essential
-  ```
 
-### Run project
-This project requires *CMake* (version 3.16+)
-1. ***Configure the project***(creates the `build` directory and generates build files):
-    ```bash
-    cmake -B build
-    ```
-2. ***Build and Run*** the project using the custom target:
-    ```bash
-    cmake --build build --target run
-    ```
+* **CMake 3.28+**
+* **Ninja**
+* **Git**
+* A compiler with **C++20** support
 
-### Automation
-The `CMakeLists.txt` file is configured to automatically generate and copy the configuration file. Each time you build or run the project using the custom target:
+SFML itself does not need to be installed manually.
+The superbuild downloads and builds **SFML 3.1.0** automatically.
+
+### Linux
+
+On Ubuntu/Debian, install the required tools and system libraries:
+
 ```bash
-cmake --build build --target run
-```
-The `compile_commands.json` file is automatically copied from the `build/` directory
+sudo apt update
 
+sudo apt install \
+    build-essential \
+    cmake \
+    ninja-build \
+    git \
+    libxrandr-dev \
+    libxcursor-dev \
+    libxi-dev \
+    libudev-dev \
+    libfreetype-dev \
+    libgl1-mesa-dev \
+    libegl1-mesa-dev \
+    libharfbuzz-dev

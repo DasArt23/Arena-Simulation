@@ -1,0 +1,42 @@
+{
+  "version": 6,
+
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 25,
+    "patch": 0
+  },
+
+  "configurePresets": [
+    {
+      "name": "superbuild",
+      "displayName": "Arena Superbuild",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-super"
+    }
+  ],
+
+  "buildPresets": [
+    {
+      "name": "superbuild",
+      "configurePreset": "superbuild",
+      "jobs": 0
+    }
+  ],
+
+  "workflowPresets": [
+    {
+      "name": "build",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "superbuild"
+        },
+        {
+          "type": "build",
+          "name": "superbuild"
+        }
+      ]
+    }
+  ]
+}

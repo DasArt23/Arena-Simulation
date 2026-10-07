@@ -1,38 +1,43 @@
-cmake_minimum_required(VERSION 3.16)
-project(ArenaSimulation)
+cmake_minimum_required(VERSION 3.28)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+project(ArenaSimulationSuperbuild NONE)
 
-find_package(SFML REQUIRED COMPONENTS System Window Graphics)
+include(ExternalProject)
 
-if(CMAKE_EXPORT_COMPILE_COMMANDS)
-    add_custom_target(copy_compile_commands
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${CMAKE_BINARY_DIR}/compile_commands.json"
-            "${CMAKE_SOURCE_DIR}/compile_commands.json"
-        COMMENT "Copying compile_commands.json to source directory..."
-    )
-	if(TARGET run)
-		add_dependencies(run compile_commands)
-	endif()
-endif()
+set(DEPS_INSTALL_DIR "${CMAKE_BINARY_DIR}/dependencies")
 
-add_executable(ArenaSimulation 
-    main.cpp
-    src/app/app.cpp
-    src/window/window.cpp
-	src/window/render.cpp
-	src/window/shape.cpp
-	src/math/clock.cpp
+ExternalProject_Add(
+    SFML_external
+
+    GIT_REPOSITORY https://github.com/SFML/SFML.git
+    GIT_TAG 3.1.0
+    GIT_SHALLOW TRUE
+
+    INSTALL_DIR "${DEPS_INSTALL_DIR}/sfml"
+
+    CMAKE_ARGS
+        -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+        -DBUILD_SHARED_LIBS:BOOL=OFF
+
+        -DSFML_BUILD_AUDIO:BOOL=OFF
+        -DSFML_BUILD_NETWORK:BOOL=OFF
+
+        -DSFML_BUILD_EXAMPLES:BOOL=OFF
+        -DSFML_BUILD_DOC:BOOL=OFF
 )
 
-add_custom_target(run
-    COMMAND $<TARGET_FILE:ArenaSimulation>
-    DEPENDS ArenaSimulation
-	COMMENT "Running Arena Simulation..."
-)
+ExternalProject_Add(
+    ArenaSimulation_external
 
-target_link_libraries(ArenaSimulation PRIVATE sfml-graphics sfml-window sfml-system)
-target_include_directories(ArenaSimulation PRIVATE src)
+    SOURCE_DIR "${CMAKE_SOURCE_DIR}/arena"
+
+    CMAKE_ARGS
+        -DCMAKE_PREFIX_PATH:PATH=${DEPS_INSTALL_DIR}/sfml
+        -DSFML_STATIC_LIBRARIES:BOOL=ON
+
+    BUILD_ALWAYS TRUE
+
+    INSTALL_COMMAND ""
+
+    DEPENDS SFML_external
+)
