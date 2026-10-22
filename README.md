@@ -1,5 +1,7 @@
 # Arena-Simulation
 
+***The project is frozen until holidays***
+
 This is an arena simulation where AI bots,
 created using a genetic algorithm, will fight, learn, and evolve to win.
 
